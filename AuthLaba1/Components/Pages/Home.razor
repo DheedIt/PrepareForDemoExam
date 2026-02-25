@@ -3,7 +3,7 @@
 @using AuthLaba1.Data
 @using AuthLaba1.Models
 @using Microsoft.EntityFrameworkCore
-@inject AppDbContext Context
+@inject IDbContextFactory<AppDbContext> ContextFactory
 @inject NavigationManager Navigation
 
 <PageTitle>Home</PageTitle>
@@ -45,6 +45,7 @@ Welcome to your new app.
     }
     private async Task<bool> IsCorrect(string username, string password)
     {
-        return await (Context.Users.AnyAsync(u => u.Username == username && u.Password == password));
+        var context = await ContextFactory.CreateDbContextAsync();
+        return await (context.Users.AnyAsync(u => u.Username == username && u.Password == password));
     }
 }
