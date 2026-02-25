@@ -40,6 +40,16 @@ Welcome to your new app.
     private async Task LogIn()
     {
         var context = await ContextFactory.CreateDbContextAsync();
-        var isExists = await (context.Users.AnyAsync(u => u.Username == UserModel.Username && u.Password == UserModel.Password));
+        var sessionUser = await (context.Users.Where(u => u.Username == UserModel.Username && u.Password == UserModel.Password).FirstOrDefaultAsync());
+        if(sessionUser is not null)
+        {
+            UserSession.SetSession(sessionUser.Id, sessionUser.Username, sessionUser.UserType);
+            string navLink = UserSession.Role == "Student" ? "/student" : "/teacher";
+            Navigation.NavigateTo(navLink);
+        }
+        else
+        {
+            errorMessage = "Wrong username or password. Try again.";
+        }
     }
 }

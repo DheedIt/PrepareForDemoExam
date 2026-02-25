@@ -1,0 +1,46 @@
+﻿@page "/student"
+@using AuthLaba1.Data
+@using AuthLaba1.Models.Dto
+@using AuthLaba1.Services
+@using Microsoft.EntityFrameworkCore
+@rendermode InteractiveServer
+@inject UserSession UserSession
+@inject IDbContextFactory<AppDbContext> ContextFactory
+<h3>Student</h3>
+
+@foreach (var item in userMarks)
+{
+    <div>
+        @item.ItemName : @item.Mark
+    </div>
+}
+
+@code {
+    private bool isLoading = true;
+    private List<ItemMarksDto> userMarks = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        isLoading = true;
+        userMarks = await GetUserMarks();
+        isLoading = false;
+    }
+
+    public async Task<List<ItemMarksDto>> GetUserMarks()
+    {
+        var context = await ContextFactory.CreateDbContextAsync();
+        List<ItemMarksDto> ItemMarks = await (from m in context.Users
+                    where m.Id == UserSession.UserId
+                    join j1 in context.Items on m.Id equals j1.UserId into joined1
+                    from item in joined1.DefaultIfEmpty()
+                    join j2 in context.Marks on item.Id equals j2.ItemId into joined2
+                    from mark in joined2.DefaultIfEmpty()
+                           select new ItemMarksDto
+                    {
+                        ItemName = item != null ? item.Name : "No Item",
+                        Mark = mark != null ? mark.Score : 0
+                    }).ToListAsync();
+        return ItemMarks;
+
+    }
+}
