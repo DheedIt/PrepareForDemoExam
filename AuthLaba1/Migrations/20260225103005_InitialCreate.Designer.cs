@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AuthLaba1.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260225102412_NewClasses")]
-    partial class NewClasses
+    [Migration("20260225103005_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
