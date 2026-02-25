@@ -1,7 +1,50 @@
 ﻿@page "/"
+@rendermode InteractiveServer
+@using AuthLaba1.Data
+@using AuthLaba1.Models
+@using Microsoft.EntityFrameworkCore
+@inject AppDbContext Context
+@inject NavigationManager Navigation
 
 <PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
+<h1>Hello, User! @UserModel.Username</h1>
+<h2>Enter your Private data for Log In. Trust me.</h2>
+<h3> @errorMessage </h3>
+<EditForm Model="@UserModel" OnSubmit="Execute" FormName="LogIn">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div>
+        <label> UserName: </label>
+        <InputText @bind-Value="UserModel.Username"></InputText>
+        <ValidationMessage For="@(() => UserModel.Username)" />
+    </div>
+    <div>
+        <label> Password </label>
+        <InputText @bind-Value="UserModel.Password"></InputText>
+        <ValidationMessage For="(() => UserModel.Password)"/> 
+    </div>
+    <button type="submit"> Log In </button>
+</EditForm>
 
 Welcome to your new app.
+
+@code{
+    private User UserModel = new();
+    string errorMessage = "";
+
+    private async Task Execute()
+    {
+        var isValid = await IsCorrect(UserModel.Username, UserModel.Password);
+        if (isValid)
+            Navigation.NavigateTo("Account");
+        else
+            errorMessage = "Invalid Data";
+
+    }
+    private async Task<bool> IsCorrect(string username, string password)
+    {
+        return await (Context.users.AnyAsync(u => u.Username == username && u.Password == password));
+    }
+}
