@@ -1,18 +1,17 @@
-﻿namespace AuthLaba1.Models
+﻿using System;
+using System.Collections.Generic;
+
+namespace AuthLaba1.Models;
+
+public partial class Item
 {
-	public class Item
-	{
-		public int Id { get; set; }
-		public string Name { get; set; } = null!;
+    public int Id { get; set; }
 
-		public List<Mark> Marks { get; set; } = new List<Mark>();
+    public int UserId { get; set; }
 
-		public int TeacherId { get; set; }
-		public Teacher Teacher { get; set; } = null!;
+    public string Name { get; set; } = null!;
 
-		public int StudentId { get; set; }
-		public Student Student { get; set; } = null!;
+    public virtual ICollection<Mark> Marks { get; set; } = new List<Mark>();
 
-
-	}
+    public virtual User User { get; set; } = null!;
 }

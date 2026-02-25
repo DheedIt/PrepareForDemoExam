@@ -1,5 +1,6 @@
 using AuthLaba1.Components;
 using AuthLaba1.Data;
+using AuthLaba1.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,7 +10,8 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 string connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? "NoConnection";
 builder.Services.AddDbContextFactory<AppDbContext>(options => options.UseMySql(connectionString,ServerVersion.AutoDetect(connectionString)));
-    var app = builder.Build();
+builder.Services.AddScoped<UserSession>();
+var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

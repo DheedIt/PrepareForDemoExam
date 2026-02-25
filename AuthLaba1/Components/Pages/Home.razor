@@ -2,16 +2,18 @@
 @rendermode InteractiveServer
 @using AuthLaba1.Data
 @using AuthLaba1.Models
+@using AuthLaba1.Services
 @using Microsoft.EntityFrameworkCore
 @inject IDbContextFactory<AppDbContext> ContextFactory
 @inject NavigationManager Navigation
+@inject UserSession UserSession
 
 <PageTitle>Home</PageTitle>
 
 <h1>Hello, User! @UserModel.Username</h1>
 <h2>Enter your Private data for Log In. Trust me.</h2>
 <h3> @errorMessage </h3>
-<EditForm Model="@UserModel" OnSubmit="Execute" FormName="LogIn">
+<EditForm Model="@UserModel" OnSubmit="LogIn" FormName="LogIn">
     <DataAnnotationsValidator />
     <ValidationSummary />
 
@@ -23,29 +25,21 @@
     <div>
         <label> Password </label>
         <InputText @bind-Value="UserModel.Password"></InputText>
-        <ValidationMessage For="(() => UserModel.Password)"/> 
+        <ValidationMessage For="(() => UserModel.Password)" />
     </div>
     <button type="submit"> Log In </button>
 </EditForm>
 
 Welcome to your new app.
 
-@code{
+@code {
     private User UserModel = new();
     string errorMessage = "";
 
-    private async Task Execute()
-    {
-        var isValid = await IsCorrect(UserModel.Username, UserModel.Password);
-        if (isValid)
-            Navigation.NavigateTo("Account");
-        else
-            errorMessage = "Invalid Data";
 
-    }
-    private async Task<bool> IsCorrect(string username, string password)
+    private async Task LogIn()
     {
         var context = await ContextFactory.CreateDbContextAsync();
-        return await (context.Users.AnyAsync(u => u.Username == username && u.Password == password));
+        var isExists = await (context.Users.AnyAsync(u => u.Username == UserModel.Username && u.Password == UserModel.Password));
     }
 }
