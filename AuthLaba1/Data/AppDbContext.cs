@@ -12,9 +12,15 @@ public partial class AppDbContext : DbContext
     {
     }
 
-    public virtual DbSet<User> users { get; set; }
+    public virtual DbSet<User> Users { get; set; }
+    public virtual DbSet<Group> Groups { get; set; }
+    public virtual DbSet<Item> Items { get; set; }
+    public virtual DbSet<Mark> Marks { get; set; }
+    public virtual DbSet<Teacher> Teachers { get; set; }
+    public virtual DbSet<Student> Students { get; set; }
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
+
+	protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder
             .UseCollation("utf8mb3_general_ci")

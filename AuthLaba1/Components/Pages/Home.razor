@@ -45,6 +45,6 @@ Welcome to your new app.
     }
     private async Task<bool> IsCorrect(string username, string password)
     {
-        return await (Context.users.AnyAsync(u => u.Username == username && u.Password == password));
+        return await (Context.Users.AnyAsync(u => u.Username == username && u.Password == password));
     }
 }
