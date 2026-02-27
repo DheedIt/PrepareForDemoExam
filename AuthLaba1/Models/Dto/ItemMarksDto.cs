@@ -2,7 +2,8 @@
 {
 	public class ItemMarksDto
 	{
+		public required int Id { get; set; }
 		public required string ItemName { get; set; }
-		public required int Mark { get; set; }
+		public List<Mark>? Mark { get; set; }
 	}
 }

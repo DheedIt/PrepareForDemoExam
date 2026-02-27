@@ -1,0 +1,96 @@
+﻿@page "/teacher"
+@using AuthLaba1.Data
+@using AuthLaba1.Models
+@using AuthLaba1.Models.Dto
+@using AuthLaba1.Services
+@using Microsoft.EntityFrameworkCore
+@rendermode InteractiveServer
+@inject UserSession UserSession
+@inject IDbContextFactory<AppDbContext> ContextFactory
+    
+<select @bind="selectedUserId">
+    <option value="0" disabled>-- Выберите студента --</option>
+
+    @foreach (var item in users)
+    {
+        <option value="@item.Id" >@item.Username</option>  
+    }
+</select>
+
+@if(isUserExists)
+{
+    <EditForm Model="SelectedUser" OnInvalidSubmit="Execute">
+        @foreach (var item in SelectedUser.Items)
+        {
+            @item.Name
+            @foreach (var mark in item.Marks)
+            {
+                <div>
+                     : <InputNumber @bind-Value="@mark.Score"/>
+                    <ValidationMessage For="@(() => mark.Score)" />
+                </div>
+            }
+        }
+        <button type="submit">Confirm changes</button>
+    </EditForm>
+
+}
+
+@code {
+    private bool isLoading = true;
+    private List<User> users = new();
+    private int selectedUserId = 0;
+    private List<ItemMarksDto> items = new();
+
+
+    private User? SelectedUser =>  users.Where(u=> u.Id == selectedUserId).FirstOrDefault();
+    private bool isUserExists => SelectedUser != null;
+
+    protected async override Task OnInitializedAsync()
+    {
+        isLoading = true;
+        await TaskGetAllUsers();
+        isLoading = false;
+    }
+
+    public async Task TaskGetAllUsers()
+    {
+        var context = await ContextFactory.CreateDbContextAsync();
+        users = await context.Users
+    .Where(u => u.UserType == "Student")
+    .Include(u => u.Items)         
+        .ThenInclude(i => i.Marks)
+    .ToListAsync();
+
+    }
+    public async Task<List<ItemMarksDto>> ShowAllStudentMarks(User user)
+    {
+        var context = await ContextFactory.CreateDbContextAsync();
+        List<ItemMarksDto> items = await (from i in context.Items
+                                          select new ItemMarksDto
+                               {
+                                   Id = i.Id,
+                                   ItemName = i.Name
+                               }).ToListAsync();
+
+        foreach (var item in items)
+        {
+            item.Mark = await (from t in context.Marks
+                               where t.ItemId == item.Id
+                               select
+
+                                   t
+                               ).ToListAsync();
+
+        }
+        return items;
+
+
+
+    }
+    public async Task Execute()
+    {
+        var context = await ContextFactory.CreateDbContextAsync();
+        await context.SaveChangesAsync();
+    }
+}
